@@ -6,12 +6,14 @@ class CodecProtocolTests(unittest.TestCase):
  def test_supported_modes_and_rates(self):
   for codec in service.MODES:
    for fps in (90,120):service.validate_mode(codec,100,fps)
- def test_h264_high_budget_preserves_av1_bounds(self):
-  for fps in (90,120):service.validate_mode('H.264',500,fps)
-  for values in (('H.264',501,90),('H.264',500.0,90),('AV1',201,90),('HEVC',501,90)):
+ def test_codecs_accept_up_to_500_mbps(self):
+  for codec in service.MODES:
+   for fps in (90,120):
+    for target in (25,200,201,480,500):service.validate_mode(codec,target,fps)
+  for values in (('H.264',501,90),('H.264',500.0,90),('AV1',501,90),('HEVC',501,90)):
    with self.assertRaises(ValueError):service.validate_mode(*values)
  def test_unknown_mode_rate_and_unbounded_bitrate_rejected(self):
-  for values in (('VP9',100,90),('AV1',201,90),('AV1',24,90),('AV1',100,91),('AV1',True,90)):
+  for values in (('VP9',100,90),('AV1',501,90),('AV1',24,90),('AV1',100,91),('AV1',True,90)):
    with self.assertRaises(ValueError):service.validate_mode(*values)
  def test_request_id_and_version(self):
   request={'protocol_version':1,'id':str(uuid.uuid4()),'action':'switch','codec':'H.264','target_mbps':100,'fps':90}

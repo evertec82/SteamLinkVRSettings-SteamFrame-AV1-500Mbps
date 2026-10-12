@@ -24,7 +24,7 @@ typedef struct Av1Config {
     uint32_t average_bps, peak_bps, keyframe_interval;
     uint32_t enable_delta_map;
     uint32_t input_bit_depth;
-    uint32_t level_index; // 0..17, or 24 = NVENC AUTOSELECT (inspect emitted header).
+    uint32_t level_index; // 0..18 (6.2 experimental), or 24 = NVENC AUTOSELECT (inspect emitted header).
     uint32_t tile_columns, tile_rows; // Version 2: 0=auto; 1,2,4,8=uniform tiles.
 } Av1Config;
 

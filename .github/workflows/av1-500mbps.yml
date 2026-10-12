@@ -1,0 +1,32 @@
+name: AV1 500 Mbps validation
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Managed codec and preset regression tests
+        run: dotnet test Tests/CoreTests --configuration Release --nologo
+      - name: Companion contract and rollback tests
+        run: python -m unittest discover -s Frame/AV1 -p "test_*.py" -v
+      - name: Build native codec adapter and boundary tests
+        shell: pwsh
+        run: ./Native/AV1Lab/build.ps1 -OutputDirectory artifacts/CodecLab/Backend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AV1-500Mbps-native-backend
+          path: |
+            artifacts/CodecLab/Backend/SteamFrameAV1Backend.dll
+            artifacts/CodecLab/Backend/trial_control.exe
+          if-no-files-found: error

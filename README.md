@@ -1,4 +1,6 @@
-# Steam Link VR Settings — Steam Frame edition
+# Steam Link VR Settings — Steam Frame AV1 500 Mbps fork
+
+> This fork extends experimental AV1 requests to 500 Mbps. Rates above 200 Mbps and level 6.2 decoding above 480 Mbps require hardware validation. Galaxy XR and other Android headsets need a separate client integration; see [headset compatibility](docs/headset-compatibility.md).
 
 A Windows app for tuning and diagnosing **Steam Frame** streaming from a PC.
 It sets the stream's bitrate and foveation, measures what the encoder actually
@@ -26,7 +28,7 @@ including the ones SteamVR doesn't show in its own UI.
 | **Foveation bias** | Shift quality between where you look and the periphery on top of Valve's own gaze-tracked map. |
 | **Advanced controls** | Tune CQ, maximum QP, peak bitrate, VBV, chroma, AQ and presets, plus resolution, buffering and sending settings, with accepted/pending/rejected readbacks and restoration. |
 | **Live dashboard** | Graphs actual encoded video Mbps and FPS, the requested target, and adapter traffic over the last 60 seconds. |
-| **Codec selector** | Switch between HEVC, AV1 and H.264, choose H.264 25–500 Mbps or AV1 25–200 Mbps at 90/120 Hz, and restore stock HEVC. AV1/H.264 are exact-build experiments and restart the stream. |
+| **Codec selector** | Switch between HEVC, AV1 and H.264, choose H.264 25–500 Mbps or AV1 25–500 Mbps at 90/120 Hz, and restore stock HEVC. AV1/H.264 are exact-build experiments and restart the stream. |
 | **Streaming issue capture** | Timestamps recovery requests, bad-link events, encoder stalls, PC presentation drops and headset receiver faults, and saves them as JSONL. |
 | **Driver patcher** | Raises the driver's 232/350 Mbps ceilings to 500 Mbps and selects HEVC level 6.2, with verified backups and one-click restore. |
 | **Connection tools** | Reads headset link status over paired wireless SSH or ADB, and can restart a stalled Frame USB connection. |
@@ -36,8 +38,10 @@ including the ones SteamVR doesn't show in its own UI.
 
 ## Download and run
 
+This fork currently ships source changes. Build the app and updated codec backend together using [the build guide](docs/building.md). CI provides a native backend artifact, not a complete portable app. The upstream release below does not contain this fork's AV1 500 Mbps changes.
+
 1. Download `SteamLinkVRSettings-SteamFrame-win-x64.zip` from the
-   [latest release](../../releases/latest).
+   [upstream release](https://github.com/elliotttate/SteamLinkVRSettings-SteamFrame/releases/latest).
 2. Extract the **whole** folder anywhere. The ZIP bundles the .NET and Windows App SDK
    runtimes, so nothing else needs to be installed.
 3. Run `SteamLinkVRSettings.exe`.

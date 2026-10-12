@@ -68,7 +68,7 @@ public sealed partial class FramePage
         BitrateInput.Maximum = CodecSwitchRequest.MaximumMbpsFor(SelectedCodec);
         CodecModeHint.Text = SelectedCodec switch
         {
-            StreamCodec.Av1 => "AV1: 25–200 Mbps, 8-bit hardware encoding and decoding. Changes to codec, bitrate or refresh reconnect SteamVR. Start with 100 Mbps at 90 Hz.",
+            StreamCodec.Av1 => "AV1: 25–500 Mbps experimental requests, 8-bit hardware encoding and decoding. Above 480 Mbps requires unverified Frame level 6.2 decoding. Changes to codec, bitrate or refresh reconnect SteamVR. Start with 100 Mbps at 90 Hz.",
             StreamCodec.H264 => "H.264: 25–500 Mbps. The packed image is smaller than AV1 (1024 × 4096). Higher targets need receiver testing; changes reconnect SteamVR.",
             _ => "HEVC: 25–500 Mbps. Targets above the stock ceiling need the bitrate patch. Display refresh follows SteamVR's Video settings."
         };

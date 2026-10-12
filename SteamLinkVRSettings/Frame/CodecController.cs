@@ -10,7 +10,7 @@ public sealed record CodecSwitchRequest(StreamCodec Codec, int TargetMbps = 100,
     public string CodecName => Codec switch { StreamCodec.Hevc => "HEVC", StreamCodec.Av1 => "AV1", StreamCodec.H264 => "H.264", _ => throw new ArgumentOutOfRangeException(nameof(Codec)) };
     public static int MaximumMbpsFor(StreamCodec codec) => codec switch
     {
-        StreamCodec.Av1 => 200, StreamCodec.H264 or StreamCodec.Hevc => 500,
+        StreamCodec.Av1 or StreamCodec.H264 or StreamCodec.Hevc => 500,
         _ => throw new ArgumentOutOfRangeException(nameof(codec))
     };
     public void Validate()
@@ -35,6 +35,7 @@ public sealed record CodecServiceStatus
     [JsonPropertyName("target_mbps")] public int TargetMbps { get; init; }
     [JsonPropertyName("fps")] public int Fps { get; init; }
     [JsonPropertyName("maximum_h264_mbps")] public int MaximumH264Mbps { get; init; } = 200;
+    [JsonPropertyName("maximum_av1_mbps")] public int MaximumAv1Mbps { get; init; } = 200;
     [JsonIgnore] public bool Live { get; init; }
     [JsonIgnore] public bool CanStart { get; init; }
     [JsonIgnore] public bool Busy => Live && State is "starting" or "switching";
@@ -82,7 +83,7 @@ public sealed class CodecController
             if (stream.Length > 65536) throw new InvalidDataException("Codec status is too large.");
             var status = JsonSerializer.Deserialize<CodecServiceStatus>(stream) ?? throw new InvalidDataException("Codec status is empty.");
             if (status.ProtocolVersion != 1 || status.OwnerPid <= 0 || !double.IsFinite(status.OwnerCreatedEpoch) || !double.IsFinite(status.UpdatedEpoch) ||
-                status.MaximumH264Mbps is < 25 or > 500 ||
+                status.MaximumH264Mbps is < 25 or > 500 || status.MaximumAv1Mbps is < 25 or > 500 ||
                 status.State is not ("starting" or "switching" or "ready" or "error" or "closed") ||
                 status.ActiveCodec is not ("HEVC" or "AV1" or "H.264" or "Unknown"))
                 throw new InvalidDataException("Codec status is incompatible.");
@@ -95,7 +96,7 @@ public sealed class CodecController
                 return status with { Live = false, CanStart = false, ActiveCodec = "Unknown", Message = "Codec service heartbeat is stale. Wait for recovery before starting another session." };
             return status with { Live = true, CanStart = false, Message = SafeMessage(status.Message) };
         }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or System.ComponentModel.Win32Exception)
+        catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or JsonException or InvalidOperationException or System.ComponentModel.Win32Exception)
         {
             return new() { State = "error", Message = "Codec service status is unavailable or incompatible. No switch was sent." };
         }
@@ -112,6 +113,8 @@ public sealed class CodecController
             if (status.Busy) throw new InvalidOperationException("A codec switch is already running. Wait for it to finish.");
             if (status.Live)
             {
+                if (request.Codec == StreamCodec.Av1 && request.TargetMbps > status.MaximumAv1Mbps)
+                    throw new InvalidOperationException($"The running codec companion only supports AV1 up to {status.MaximumAv1Mbps} Mbps. Select HEVC and apply first, then start AV1 again with the updated runtime.");
                 if (request.Codec == StreamCodec.H264 && request.TargetMbps > status.MaximumH264Mbps)
                     throw new InvalidOperationException($"The running codec companion only supports H.264 up to {status.MaximumH264Mbps} Mbps. Select HEVC and apply first, then start H.264 again with the updated runtime.");
                 return await SendAsync("switch", request, status, progress, cancellationToken).ConfigureAwait(false);

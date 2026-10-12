@@ -53,7 +53,9 @@ password entry.
 | AV1 | NVIDIA NVENC and Frame Qualcomm hardware decoder through the experimental Iris module | 8-bit Main, packed image up to 1536 × 6144, 90 or 120 Hz. |
 | H.264 | NVIDIA NVENC and the Frame's stock Qualcomm hardware decoder | Packed image 1024 × 4096, 90 or 120 Hz; the smaller image is an explicit current limitation. |
 
-H.264 accepts 25–500 Mbps requests; AV1 retains its 25–200 Mbps range.
+H.264 and AV1 accept 25–500 Mbps requests. AV1 above 200 Mbps is experimental and has not been validated on the Frame.
+Requests with a peak above 480 Mbps explicitly select AV1 level 6.2/high tier; lower requests keep level 6.1/high tier. The Frame vendor capability table advertises only level 6.1, so level 6.2 decoding may fail and trigger stock recovery.
+When updating, replace the complete codec package, including `Backend`, and end an older companion session by selecting HEVC first. The app refuses AV1 requests above an older companion's advertised ceiling (200 Mbps when absent).
 The field is the encoder's requested budget. Actual compressed output
 depends on content, and no filler is added to force a minimum transmitted rate.
 A 200 Mbps request did not maintain the desired new-frame rate in the earlier AV1
@@ -114,7 +116,7 @@ unseen future builds or a sustained-performance guarantee.
 ## H.264 bitrate sweep (October 12, 2026)
 
 The 200 Mbps software limit was extended to 500 Mbps for H.264 in the app,
-preset validator, supervisor and native adapter. AV1's 200 Mbps limit is retained.
+preset validator, supervisor and native adapter. This fork also extends AV1 requests to 500 Mbps, with explicit level 6.2 selection above 480 Mbps. This is a software change, not new throughput or hardware acceptance evidence.
 An older running supervisor is detected before sending an unsupported high-rate
 request; restore HEVC and start a new session to use the updated companion.
 

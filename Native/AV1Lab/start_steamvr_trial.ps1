@@ -1,4 +1,4 @@
-param([ValidateRange(1,200)][int]$Mbps=100,[ValidateRange(1,230)][int]$PeakMbps=115,[switch]$FixedTarget,[ValidateSet(90,120)][int]$Fps=120)
+param([ValidateRange(1,500)][int]$Mbps=100,[ValidateRange(1,500)][int]$PeakMbps=115,[switch]$FixedTarget,[ValidateSet(90,120)][int]$Fps=120)
 $ErrorActionPreference='Stop'
 if($PeakMbps -lt $Mbps){throw 'Peak must be at least the average target'}
 $labRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))

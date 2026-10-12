@@ -21,6 +21,10 @@ try {
  & (Join-Path $labCompiler 'cl.exe') /nologo /std:c++17 /O2 /EHsc /MT /W4 "/I$PSScriptRoot\..\vendor" "/Fo:$labOutput\codec_caps.obj" "/Fe:$labOutput\codec_caps.exe" "$PSScriptRoot\codec_caps.cpp" d3d11.lib
  if($LASTEXITCODE){throw 'Codec capability query compilation failed'}
  if($CapsOnly){return}
+ & (Join-Path $labCompiler 'cl.exe') /nologo /std:c++17 /EHsc /MT /W4 "/Fo:$labOutput\bitrate_limits_test.obj" "/Fe:$labOutput\bitrate_limits_test.exe" "$PSScriptRoot\bitrate_limits_test.cpp"
+ if($LASTEXITCODE){throw 'Bitrate limits test compilation failed'}
+ & "$labOutput\bitrate_limits_test.exe"
+ if($LASTEXITCODE){throw 'Bitrate limits test failed'}
  & (Join-Path $labCompiler 'cl.exe') /nologo /std:c++17 /O2 /EHsc /MT /W4 /LD "/I$PSScriptRoot\..\vendor" "/I$PSScriptRoot\..\vendor\minhook\include" "/Fo:$labOutput\\" "/Fe:$labOutput\SteamFrameAV1Backend.dll" "$PSScriptRoot\av1_backend.cpp" "$PSScriptRoot\legacy_picture.cpp" "$PSScriptRoot\legacy_api_bridge.cpp" "$PSScriptRoot\steamvr_trial.cpp" "$PSScriptRoot\..\vendor\minhook\src\hook.c" "$PSScriptRoot\..\vendor\minhook\src\buffer.c" "$PSScriptRoot\..\vendor\minhook\src\trampoline.c" "$PSScriptRoot\..\vendor\minhook\src\hde\hde64.c" d3d11.lib /link "/IMPLIB:$labOutput\SteamFrameAV1Backend.lib"
  if($LASTEXITCODE){throw 'AV1 backend compilation failed'}
  & (Join-Path $labCompiler 'cl.exe') /nologo /std:c++17 /O2 /EHsc /MT /W4 "/I$PSScriptRoot" "/Fo:$labOutput\trial_control.obj" "/Fe:$labOutput\trial_control.exe" "$PSScriptRoot\trial_control.cpp" psapi.lib

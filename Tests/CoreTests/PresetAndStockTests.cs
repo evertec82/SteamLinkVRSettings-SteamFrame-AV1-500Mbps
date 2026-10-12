@@ -66,7 +66,8 @@ public sealed class PresetAndStockTests : IDisposable
     {
         StockProfiles.Validate(new() { TargetMbps = 500, Driver = new() { ["targetBandwidth"] = JsonSerializer.SerializeToElement(500d), ["reqEncMode"] = JsonSerializer.SerializeToElement("aes") } });
         StockProfiles.Validate(new() { Codec = StreamCodec.H264, TargetMbps = 500 });
-        Assert.Throws<IOException>(() => StockProfiles.Validate(new() { Codec = StreamCodec.Av1, TargetMbps = 201 }));
+        StockProfiles.Validate(new() { Codec = StreamCodec.Av1, TargetMbps = 500 });
+        Assert.Throws<IOException>(() => StockProfiles.Validate(new() { Codec = StreamCodec.Av1, TargetMbps = 501 }));
     }
     [Fact]
     public async Task InvalidValuesCannotReplaceSavedPresets()

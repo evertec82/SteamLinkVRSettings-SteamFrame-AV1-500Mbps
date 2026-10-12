@@ -16,7 +16,7 @@ parser=argparse.ArgumentParser();parser.add_argument('--minutes',type=int,defaul
 parser.add_argument('--mbps',type=int,default=100);parser.add_argument('--peak-mbps',type=int,default=115)
 parser.add_argument('--fixed-target',action='store_true');parser.add_argument('--fps',type=int,choices=(90,120),default=120);a=parser.parse_args()
 if not 1<=a.minutes<=90:raise ValueError('Use 1-90 minutes per temporary session')
-if not 1<=a.mbps<=200 or not a.mbps<=a.peak_mbps<=230:raise ValueError('Use 1-200 Mbps average and average..230 Mbps peak')
+if not 1<=a.mbps<=500 or not a.mbps<=a.peak_mbps<=500:raise ValueError('Use 1-500 Mbps average and average..500 Mbps peak')
 
 def command(args,timeout=30):
  p=subprocess.run(args,cwd=ROOT,capture_output=True,text=True,timeout=timeout)

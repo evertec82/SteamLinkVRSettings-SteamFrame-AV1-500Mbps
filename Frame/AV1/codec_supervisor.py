@@ -15,7 +15,7 @@ def validate_request(value):
  if action=='switch':validate_mode(value.get('codec'),value.get('target_mbps'),value.get('fps'))
  return identifier,action
 def validate_mode(codec,target,fps):
- maximum=200 if codec=='AV1' else 500
+ maximum=500
  if codec not in MODES or type(target) is not int or not 25<=target<=maximum or type(fps) is not int or fps not in (90,120):
   raise ValueError('Unsupported codec, bitrate or refresh rate')
 def creation_epoch():
@@ -51,7 +51,7 @@ class Supervisor:
   self.mutex=threading.Lock()
   self.status={'protocol_version':1,'owner_pid':os.getpid(),'owner_created_epoch':creation_epoch(),'updated_epoch':time.time(),
    'state':'starting','active_codec':'Unknown','message':'Starting the paired codec session.','operation_id':'',
-   'last_result':None,'target_mbps':config['target_mbps'],'fps':config['fps'],'stream_pid':0,'maximum_h264_mbps':500}
+   'last_result':None,'target_mbps':config['target_mbps'],'fps':config['fps'],'stream_pid':0,'maximum_h264_mbps':500,'maximum_av1_mbps':500}
   settings=json.loads((self.steam/'config/steamvr.vrsettings').read_text(encoding='utf-8-sig'))
   width=settings.get('driver_vrlink',{}).get('streamFormatWidth',1536)
   self.original_width=width if type(width) is int and 128<=width<=1536 else 1536

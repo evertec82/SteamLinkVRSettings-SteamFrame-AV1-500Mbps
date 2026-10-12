@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include <windows.h>
+#include "bitrate_limits.h"
 #include <psapi.h>
 #include <algorithm>
 #include <filesystem>
@@ -54,9 +55,7 @@ int wmain(int argc,wchar_t** argv){
    if(argc>=8)config.fps=number(argv[7]);
    if(argc==9)config.codec=number(argv[8]);
   }
-  const auto average_limit=config.codec==2?500000000u:200000000u;
-  const auto peak_limit=config.codec==2?500000000u:230000000u;
-  if(config.average_bps<1000000||config.average_bps>average_limit||config.peak_bps<config.average_bps||config.peak_bps>peak_limit||config.fixed_target>1||(config.fps!=90&&config.fps!=120)||(config.codec!=1&&config.codec!=2))throw std::runtime_error("Trial budget/rate/codec outside lab bounds (H.264 500 Mbps; AV1 200 Mbps)");
+  if(!CodecBudget::Valid(config.average_bps,config.peak_bps)||config.fixed_target>1||(config.fps!=90&&config.fps!=120)||(config.codec!=1&&config.codec!=2))throw std::runtime_error("Trial budget/rate/codec outside lab bounds (H.264/AV1 500 Mbps)");
   Handle process{OpenProcess(PROCESS_CREATE_THREAD|PROCESS_VM_OPERATION|PROCESS_VM_READ|PROCESS_VM_WRITE|PROCESS_QUERY_INFORMATION,FALSE,pid)};
   if(!process.value)throw std::runtime_error("Cannot open SteamVR server");
   wchar_t image[32768];DWORD length=32768;USHORT machine=0,native=0;

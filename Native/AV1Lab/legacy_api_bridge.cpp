@@ -1,6 +1,7 @@
 #define AV1_BACKEND_BUILD
 #define NOMINMAX
 #include <windows.h>
+#include "bitrate_limits.h"
 #include <algorithm>
 #include <cstring>
 #include <mutex>
@@ -30,9 +31,7 @@ bool requested_fixed=false;
 uint32_t requested_fps=120;
 uint32_t requested_codec=1;
 bool valid_budget(uint32_t average,uint32_t peak){
- const uint32_t average_limit=requested_codec==2?500000000u:200000000u;
- const uint32_t peak_limit=requested_codec==2?500000000u:230000000u;
- return average>=1000000&&average<=average_limit&&peak>=average&&peak<=peak_limit;
+ return CodecBudget::Valid(average,peak);
 }
 GUID codec_guid(){return requested_codec==2?NV_ENC_CODEC_H264_GUID:NV_ENC_CODEC_AV1_GUID;}
 Av1BridgeStats stats{sizeof(Av1BridgeStats),1};
@@ -114,7 +113,7 @@ bool configure(void* encoder,const NV_ENC_INITIALIZE_PARAMS& source,NV_ENC_INITI
   h264.sliceMode=3;h264.sliceModeData=1;
  }else{
   auto& av1=config.encodeCodecConfig.av1Config;
-  av1.level=17;av1.tier=NV_ENC_TIER_AV1_1;av1.idrPeriod=requested_fps;
+  av1.level=CodecBudget::Av1Level(requested_peak);av1.tier=NV_ENC_TIER_AV1_1;av1.idrPeriod=requested_fps;
   av1.repeatSeqHdr=1;av1.enableBitstreamPadding=0;av1.pixelBitDepthMinus8=av1.inputPixelBitDepthMinus8=0;
  }
  return true;

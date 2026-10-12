@@ -23,7 +23,7 @@ int main(int argc,char** argv){
  NV_ENCODE_API_FUNCTION_LIST api{};api.version=NV_ENCODE_API_FUNCTION_LIST_VER;void* encoder=nullptr;
  NV_ENC_OUTPUT_PTR output=nullptr;NV_ENC_REGISTERED_PTR registered=nullptr;HANDLE event=nullptr;bool event_registered=false;
  try{
-  if(Av1ConfigureLegacyBudget(200000001,200000001,1)==0||Av1ConfigureLegacyBudget(200000000,199999999,1)==0||Av1ConfigureLegacyBudget(200000000,200000000,2)==0)throw std::runtime_error("Budget guard failed");
+  if(Av1ConfigureLegacyBudget(500000001,500000001,1)==0||Av1ConfigureLegacyBudget(200000000,199999999,1)==0||Av1ConfigureLegacyBudget(200000000,200000000,2)==0)throw std::runtime_error("Budget guard failed");
   const uint32_t average=fixed?target:100000000,peak=fixed?target:115000000;
   if(Av1ConfigureLegacyCodec(3)==0||Av1ConfigureLegacyCodec(h264?2:1))throw std::runtime_error("Codec guard failed");
   if(h264&&(Av1ConfigureLegacyBudget(500000000,500000000,1)||Av1ConfigureLegacyBudget(500000001,500000001,1)==0))throw std::runtime_error("H.264 budget guard failed");

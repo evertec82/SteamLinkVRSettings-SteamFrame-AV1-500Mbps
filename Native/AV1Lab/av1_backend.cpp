@@ -3,6 +3,7 @@
 #define NOMINMAX
 #include "av1_backend.h"
 #include <windows.h>
+#include "bitrate_limits.h"
 #include <d3d11.h>
 #include <wrl/client.h>
 #include <chrono>
@@ -25,8 +26,8 @@ static void require(bool valid, const char* reason) {
     if (!valid) throw std::invalid_argument(reason);
 }
 static void rates(uint32_t average, uint32_t peak) {
-    require(average >= 1000000 && average <= 480000000 && peak >= average && peak <= 480000000,
-        "Frame AV1 level 6.1 trial: rate must be 1..480 Mbps with peak >= average");
+    require(CodecBudget::Valid(average,peak),
+        "Frame AV1 trial: rate must be 1..500 Mbps with peak >= average");
 }
 
 struct Av1Session {
@@ -69,11 +70,12 @@ extern "C" int AV1_CALL Av1Create(void* d3d, const Av1Config* config, Av1Session
         require(config->fps == 120, "This prototype requires 120 fps");
         require(config->bit_depth == 8 || config->bit_depth == 10, "Bit depth must be 8 or 10");
         require(config->input_bit_depth == 8 || config->input_bit_depth == 10,"Input bit depth must be 8 or 10");
-        require(config->level_index<=17 || config->level_index==24,"Unsupported Frame AV1 level request");
+        require(config->level_index<=18 || config->level_index==24,"Unsupported Frame AV1 level request");
         auto valid_tiles=[](uint32_t n){return n==0||n==1||n==2||n==4||n==8;};
         require(valid_tiles(config->tile_columns)&&valid_tiles(config->tile_rows),"Uniform tile counts must be 0,1,2,4,8");
         require(config->enable_delta_map <= 1 && config->keyframe_interval > 0, "Invalid codec options");
         rates(config->average_bps,config->peak_bps);
+        require(CodecBudget::Av1LevelSupports(config->level_index,config->peak_bps),"Above 480 Mbps requires AV1 level 6.2 or AUTOSELECT");
         s.reset(new Av1Session); s->config=*config;
         auto* device=static_cast<ID3D11Device*>(d3d); s->device=device;
         s->module=LoadLibraryExW(L"nvEncodeAPI64.dll",nullptr,LOAD_LIBRARY_SEARCH_SYSTEM32);
@@ -112,7 +114,7 @@ extern "C" int AV1_CALL Av1Create(void* d3d, const Av1Config* config, Av1Session
         rc.enableAQ=0;rc.enableTemporalAQ=0;rc.zeroReorderDelay=1;
         rc.qpMapMode=config->enable_delta_map?NV_ENC_QP_MAP_DELTA:NV_ENC_QP_MAP_DISABLED;
         auto& a=c.encodeCodecConfig.av1Config;
-        // SM8650 vendor capability table stops at level 6.1/high tier.
+        // SM8650 advertises level 6.1/high tier; level 6.2 is an unverified experiment.
         // AUTO can emit unconstrained level index 31 for small high-rate clips.
         a.level=config->level_index;
         a.tier=NV_ENC_TIER_AV1_1;
@@ -209,6 +211,7 @@ extern "C" int AV1_CALL Av1SetRate(Av1Session* s,uint32_t average,uint32_t peak)
     try {
         require(s!=nullptr,"Missing session");rates(average,peak);
         std::lock_guard<std::mutex> guard(s->lock);
+        require(CodecBudget::Av1LevelSupports(s->config.level_index,peak),"Above 480 Mbps requires restarting at AV1 level 6.2 or AUTOSELECT");
         NV_ENC_CONFIG next=s->nv_config;next.rcParams.averageBitRate=average;
         next.rcParams.maxBitRate=peak;next.rcParams.vbvBufferSize=average/120;
         NV_ENC_RECONFIGURE_PARAMS change{};change.version=NV_ENC_RECONFIGURE_PARAMS_VER;
