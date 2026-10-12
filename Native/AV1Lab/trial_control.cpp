@@ -55,7 +55,7 @@ int wmain(int argc,wchar_t** argv){
    if(argc>=8)config.fps=number(argv[7]);
    if(argc==9)config.codec=number(argv[8]);
   }
-  if(!CodecBudget::Valid(config.average_bps,config.peak_bps)||config.fixed_target>1||(config.fps!=90&&config.fps!=120)||(config.codec!=1&&config.codec!=2))throw std::runtime_error("Trial budget/rate/codec outside lab bounds (H.264/AV1 500 Mbps)");
+  if(!CodecBudget::Valid(config.average_bps,config.peak_bps)||config.fixed_target>1||!CodecBudget::ValidFps(config.fps)||(config.codec!=1&&config.codec!=2))throw std::runtime_error("Trial budget/rate/codec outside lab bounds (H.264/AV1 500 Mbps)");
   Handle process{OpenProcess(PROCESS_CREATE_THREAD|PROCESS_VM_OPERATION|PROCESS_VM_READ|PROCESS_VM_WRITE|PROCESS_QUERY_INFORMATION,FALSE,pid)};
   if(!process.value)throw std::runtime_error("Cannot open SteamVR server");
   wchar_t image[32768];DWORD length=32768;USHORT machine=0,native=0;

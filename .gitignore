@@ -46,3 +46,7 @@ Thumbs.db
 desktop.ini
 nul
 artifacts/
+
+# Python cache files
+__pycache__/
+*.pyc

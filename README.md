@@ -1,6 +1,6 @@
 # Steam Link VR Settings — Steam Frame AV1 500 Mbps fork
 
-> This fork extends experimental AV1 requests to 500 Mbps. Rates above 200 Mbps and level 6.2 decoding above 480 Mbps require hardware validation. Galaxy XR and other Android headsets need a separate client integration; see [headset compatibility](docs/headset-compatibility.md).
+> This fork extends experimental AV1 requests to 500 Mbps. Rates above 200 Mbps and level 6.2 decoding above 480 Mbps require hardware validation. An untested Galaxy XR candidate for the inspected bundled Steam Link VR 2.0.24 APK is available through the [separate Android patch recipe and launcher](Android/README.md); see [headset compatibility](docs/headset-compatibility.md).
 
 A Windows app for tuning and diagnosing **Steam Frame** streaming from a PC.
 It sets the stream's bitrate and foveation, measures what the encoder actually

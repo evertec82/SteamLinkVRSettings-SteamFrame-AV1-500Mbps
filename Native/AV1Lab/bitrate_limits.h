@@ -4,6 +4,7 @@
 namespace CodecBudget {
 constexpr uint32_t MaximumBps = 500000000u;
 constexpr uint32_t Av1Level61MaximumBps = 480000000u;
+constexpr bool ValidFps(uint32_t fps) { return fps == 72u || fps == 90u || fps == 120u; }
 constexpr bool Valid(uint32_t average, uint32_t peak) {
     return average >= 1000000u && average <= MaximumBps && peak >= average && peak <= MaximumBps;
 }

@@ -1,5 +1,9 @@
 #include "bitrate_limits.h"
 
+static_assert(CodecBudget::ValidFps(72));
+static_assert(CodecBudget::ValidFps(90));
+static_assert(CodecBudget::ValidFps(120));
+static_assert(!CodecBudget::ValidFps(71));
 static_assert(CodecBudget::Valid(1000000,1000000));
 static_assert(CodecBudget::Valid(200000001,230000001));
 static_assert(CodecBudget::Valid(500000000,500000000));

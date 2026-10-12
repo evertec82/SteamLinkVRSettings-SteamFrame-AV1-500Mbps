@@ -6,7 +6,7 @@ The PC bitrate and settings controls may apply to other headsets using Valve's `
 
 ## Galaxy XR
 
-Samsung lists AV1 among Galaxy XR's supported codecs, but that does not demonstrate Steam Link VR's AV1 receiver support. This fork does not currently enable AV1 on Galaxy XR, Quest, PICO, or HTC headsets. The Frame kernel module and client patch cannot be installed on Galaxy XR's Android client.
+Samsung lists AV1 among Galaxy XR's supported codecs, but that does not demonstrate Steam Link VR's AV1 receiver support. The normal GUI does not enable AV1 on Galaxy XR, Quest, PICO, or HTC headsets. A separate, untested [Galaxy XR candidate](../Android/README.md) now patches the VR decoder selector in the exact Steam Link VR 2.0.24 APK bundled with the inspected SteamVR build. Its Android receiver and native host adapter require end-to-end headset testing. The Frame kernel module and client patch cannot be installed on Galaxy XR's Android client.
 
 A Galaxy XR port needs the exact Steam Link APK version (and source or patch project when available), its codec negotiation/packet format, and an Android AV1 receiver using MediaCodec. The receiver must support the stream's resolution, profile, level and rate. Host refresh-rate and packed-image restrictions also need to match the Galaxy XR client rather than reuse Frame's 90/120 Hz and 1536x6144 assumptions. End-to-end validation needs hardware tests with encoder output, decoded frames, latency and decoder faults measured together.
 

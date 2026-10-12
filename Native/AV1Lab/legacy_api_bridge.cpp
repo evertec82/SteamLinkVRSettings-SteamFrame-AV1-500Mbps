@@ -289,7 +289,7 @@ extern "C" int AV1_CALL Av1ConfigureLegacyBudget(uint32_t average,uint32_t peak,
 }
 
 extern "C" int AV1_CALL Av1ConfigureLegacyRate(uint32_t fps){
- if(fps!=90&&fps!=120)return -1;
+ if(!CodecBudget::ValidFps(fps))return -1;
  std::lock_guard<std::mutex> lock(mutex);
  if(!sessions.empty())return -2;
  requested_fps=fps;return 0;
